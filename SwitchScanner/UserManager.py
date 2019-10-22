@@ -1,19 +1,24 @@
 import SSHTool
+import random
+import configparser
 from ftplib import FTP
 
+parse_config = configparser.ConfigParser()
+parse_config.read('../data/config.ini')
+config = parse_config['DEFAULT']
 username_AD = ''
 password_AD = ''
-key_file_location
+key_file_location = ''
+characters = 'abcdefghijklmnopqrstuvwkyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*'
 
 schoolcores_9900 = []
-with open("../data/9900.txt") as file:
+with open(config['SchoolCoreList']) as file:
     for line in file:
-        print(line.strip('\n'))
-        schoolcores_9900.append(line.strip('\n'))
-
+        entry = tuple(line.split())
+        schoolcores_9900.append(entry)
 
 def upload_key_9900(schoolcores, keyfile, user, password):
-    for device in schoolcores:
+    for device, site in schoolcores:
         if device:
             try:
                 ftp = FTP(device, user, password)
@@ -29,13 +34,15 @@ def upload_key_9900(schoolcores, keyfile, user, password):
 
 
 def make_user_9900(schoolcores, username, passwd):
-    commands = ['user sshuser password SSHkeySSH read-only all',
-                'installsshkey sshuser /flash/system/sshuser_dsa.pub',
-                'write memory',
-                'copy running certified']
-    for device in schoolcores:
+    for device, site in schoolcores:
         if device:
+            commands = ['user sshuser password {randstring} '
+                        'read-only all'.format(randstring=''.join(random.choice(characters) for i in range(30))),
+                        'installsshkey sshuser /flash/system/sshuser_dsa.pub',
+                        'write memory',
+                        'copy running certified']
             for command in commands:
+                print(command)
                 SSHTool.send_command_nokey(device, command, username=username, password=passwd)
         print(device + ': User Creation is complete.')
 

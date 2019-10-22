@@ -110,7 +110,9 @@ def blade_audit_9900(schoolcores_9900, searchstartdate):
     # Set the empty text variable and commands variable
     text = ''
     commands = \
-        ['show log swlog timestamp {date} 00:00:00 slot 1/1 | grep -i "is down'
+        ['show log swlog timestamp {date} 00:00:00 slot 1/1 |'
+         ' grep -i niMgrProcessHealthCheckTimeout'.format(date=searchstartdate),
+         'show log swlog timestamp {date} 00:00:00 slot 1/1 | grep -i "is down'
          ' | grep -Ei "chas:1 slot:(1|2|3|4|5|6|7) is down"'.format(date=searchstartdate),
             'show log swlog timestamp {date} 00:00:00 slot 1/1 | grep -i "NI_Down"'.format(date=searchstartdate),
             'show log swlog timestamp {date} 00:00:00 | grep -i "fabric main error'.format(date=searchstartdate),
