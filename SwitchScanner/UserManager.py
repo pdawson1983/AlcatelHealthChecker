@@ -6,8 +6,8 @@ from ftplib import FTP
 parse_config = configparser.ConfigParser()
 parse_config.read('../data/config.ini')
 config = parse_config['DEFAULT']
-username_AD = ''
-password_AD = ''
+username_AD = config['9900ADServiceAccountName']
+password_AD = config['9900ADServiceAccountPassword']
 key_file_location = ''
 characters = 'abcdefghijklmnopqrstuvwkyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*'
 
