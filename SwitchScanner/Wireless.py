@@ -21,108 +21,106 @@ def ap_status(wireless_controllers, username, password):
     ap105_down = ap204_down = ap225_down = ap325_down = ap535_down = 0
     text = ''
     # iterate through controllers
-    for device_ip, site_name in wireless_controllers:
-        ap_log = ''
-        # Send command set using username and password SSHTool.  Output should be a list saved to ssh_output variable
-        # If there is no connecion then an error will be stored to the variable
-        ssh_output = SSHTool.send_command_nokey(device_ip, command, username, password)
-        # Check that the ssh_output is a list
-        if type(ssh_output) is not list:
-            # save sshdata variable as list
-            sshdata = [ssh_output]
-        else:
-            # save list to sshdata variable
-            sshdata = ssh_output
-        if sshdata:
-            wireless_controller_count += 1
-            for line in sshdata:
-                # Catch error states with regex
-                if re.findall(r"Error:\W", line):
-                    # if there is already data in the ap_log variable then just append
+    device_ip, site_name = wireless_controllers
+    ap_log = ''
+    # Send command set using username and password SSHTool.  Output should be a list saved to ssh_output variable
+    # If there is no connecion then an error will be stored to the variable
+    ssh_output = SSHTool.send_command_nokey(device_ip, command, username, password)
+    # Check that the ssh_output is a list
+    if type(ssh_output) is not list:
+        # save sshdata variable as list
+        sshdata = [ssh_output]
+    else:
+        # save list to sshdata variable
+        sshdata = ssh_output
+    if sshdata:
+        wireless_controller_count += 1
+        for line in sshdata:
+            # Catch error states with regex
+            if re.findall(r"Error:\W", line):
+                # if there is already data in the ap_log variable then just append
+                if ap_log:
+                    ap_log += '\t' + line + '\n'
+                # if not then add the site name and IP to the entry
+                else:
+                    ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
+                    ap_log += '\t' + line + '\n'
+            if re.findall(r"AP105", line, flags=re.IGNORECASE):
+                # If match then increment device count
+                ap105 += 1
+                if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
+                    # if up then increment device up count
+                    ap105_up += 1
+                if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
+                    # if down then increment device down count and add to ap_log
+                    ap105_down += 1
                     if ap_log:
                         ap_log += '\t' + line + '\n'
-                    # if not then add the site name and IP to the entry
                     else:
                         ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
                         ap_log += '\t' + line + '\n'
-                if re.findall(r"AP105", line, flags=re.IGNORECASE):
-                    # If match then increment device count
-                    ap105 += 1
-                    if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
-                        # if up then increment device up count
-                        ap105_up += 1
-                    if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
-                        # if down then increment device down count and add to ap_log
-                        ap105_down += 1
-                        if ap_log:
-                            ap_log += '\t' + line + '\n'
-                        else:
-                            ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
-                            ap_log += '\t' + line + '\n'
-                if re.findall(r"AP204", line, flags=re.IGNORECASE):
-                    # If match then increment device count
-                    ap204 += 1
-                    if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
-                        # if up then increment device up count
-                        ap204_up += 1
-                    if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
-                        # if down then increment device down count and add to ap_log
-                        ap204_down += 1
-                        if ap_log:
-                            ap_log += '\t' + line + '\n'
-                        else:
-                            ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
-                            ap_log += '\t' + line + '\n'
-                if re.findall(r"AP225", line, flags=re.IGNORECASE):
-                    # If match then increment device count
-                    ap225 += 1
-                    if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
-                        # if up then increment device up count
-                        ap225_up += 1
-                    if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
-                        # if down then increment device down count and add to ap_log
-                        ap225_down += 1
-                        if ap_log:
-                            ap_log += '\t' + line + '\n'
-                        else:
-                            ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
-                            ap_log += '\t' + line + '\n'
-                if re.findall(r"AP325", line, flags=re.IGNORECASE):
-                    # If match then increment device count
-                    ap325 += 1
-                    if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
-                        # if up then increment device up count
-                        ap325_up += 1
-                    if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
-                        # if down then increment device down count and add to ap_log
-                        ap325_down += 1
-                        if ap_log:
-                            ap_log += '\t' + line + '\n'
-                        else:
-                            ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
-                            ap_log += '\t' + line + '\n'
-                if re.findall(r"AP535", line, flags=re.IGNORECASE):
-                    # If match then increment device count
-                    ap535 += 1
-                    if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
-                        # if up then increment device up count
-                        ap535_up += 1
-                    if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
-                        # if down then increment device down count and add to ap_log
-                        ap535_down += 1
-                        if ap_log:
-                            ap_log += '\t' + line + '\n'
-                        else:
-                            ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
-                            ap_log += '\t' + line + '\n'
-        # If there is data in ap_log variable append to the text variable
-        if ap_log:
-            text += ap_log
+            if re.findall(r"AP204", line, flags=re.IGNORECASE):
+                # If match then increment device count
+                ap204 += 1
+                if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
+                    # if up then increment device up count
+                    ap204_up += 1
+                if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
+                    # if down then increment device down count and add to ap_log
+                    ap204_down += 1
+                    if ap_log:
+                        ap_log += '\t' + line + '\n'
+                    else:
+                        ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
+                        ap_log += '\t' + line + '\n'
+            if re.findall(r"AP225", line, flags=re.IGNORECASE):
+                # If match then increment device count
+                ap225 += 1
+                if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
+                    # if up then increment device up count
+                    ap225_up += 1
+                if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
+                    # if down then increment device down count and add to ap_log
+                    ap225_down += 1
+                    if ap_log:
+                        ap_log += '\t' + line + '\n'
+                    else:
+                        ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
+                        ap_log += '\t' + line + '\n'
+            if re.findall(r"AP325", line, flags=re.IGNORECASE):
+                # If match then increment device count
+                ap325 += 1
+                if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
+                    # if up then increment device up count
+                    ap325_up += 1
+                if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
+                    # if down then increment device down count and add to ap_log
+                    ap325_down += 1
+                    if ap_log:
+                        ap_log += '\t' + line + '\n'
+                    else:
+                        ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
+                        ap_log += '\t' + line + '\n'
+            if re.findall(r"AP535", line, flags=re.IGNORECASE):
+                # If match then increment device count
+                ap535 += 1
+                if re.findall(r'\Wup\W', line, flags=re.IGNORECASE):
+                    # if up then increment device up count
+                    ap535_up += 1
+                if re.findall(r'\Wdown\W', line, flags=re.IGNORECASE):
+                    # if down then increment device down count and add to ap_log
+                    ap535_down += 1
+                    if ap_log:
+                        ap_log += '\t' + line + '\n'
+                    else:
+                        ap_log += '{site}({siteip}):\n'.format(site=site_name, siteip=device_ip)
+                        ap_log += '\t' + line + '\n'
+    # If there is data in ap_log variable append to the text variable
+    if ap_log:
+        text += ap_log
     # once completely iterated though the devices then parse the variables to a single string
-    return parse_wireless_out(wireless_controller_count, ap105, ap204, ap225, ap325,
-                              ap535, ap105_up, ap204_up, ap225_up,
-                              ap325_up, ap535_up, ap105_down, ap204_down,
-                              ap225_down, ap325_down, ap535_down, text)
+    return wireless_controller_count, ap105, ap204, ap225, ap325, ap535, ap105_up, ap204_up, ap225_up, ap325_up,\
+        ap535_up, ap105_down, ap204_down, ap225_down, ap325_down, ap535_down, text
 
 
 def parse_wireless_out(wireless_controller_count, ap105, ap204, ap225, ap325, ap535,
@@ -139,7 +137,7 @@ def parse_wireless_out(wireless_controller_count, ap105, ap204, ap225, ap325, ap
         datetime=datetime.today().strftime("%A, %B %d, %Y"))
     # Add Counts
     message += 'Wireless Controller Count:  {wc_count}\n'.format(wc_count=wireless_controller_count)
-    message += 'Total Access Point Count:   {ap_count}\n'.format(ap_count=ap535+ap325+ap225+ap204+ap105)
+    message += 'Total Access Point Count:   {ap_count}\n'.format(ap_count=ap535 + ap325 + ap225 + ap204 + ap105)
     message += 'AP-105s Configured:         {ap105_count}\n'.format(ap105_count=ap105)
     message += 'AP-204s Configured:         {ap204_count}\n'.format(ap204_count=ap204)
     message += 'AP-225s Configured:         {ap225_count}\n'.format(ap225_count=ap225)

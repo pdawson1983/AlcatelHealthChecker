@@ -1,0 +1,1 @@
+D:\SwitchScanner\SwitchScanner\env\Scripts\activate.bat && python D:\SwitchScanner\SwitchScanner\SwitchScanner.py
